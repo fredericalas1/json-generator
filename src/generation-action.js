@@ -50,16 +50,47 @@ class GenerationAction {
                         const relation = relations[relationItem];
                         // console.log('relation', relation)
 
-                        if(relation.handleStore) {
+                        if(relation.collection && relation.handleStore) {
                             const subModel = this.modelConfig.models[relation['name']]
                             // subModel.handleStore = true;
                             const subResources = this.generate(subModel, [{name: model.name, data: resource, relationConfig: relation}]);
                             resource[relationItem] = subResources
                         }
+                        if(!relation.collection) {
+                            // console.log('relation', relation)
+                            const parentResources = this.dataService.getData(this.fileUrl + relation.fileName)
+                            // console.log('parentResources', parentResources)
+                            const parentResourcesLength = parentResources ? parentResources.length : 0;
+                            // console.log('parentResourcesLength', parentResourcesLength)
+                            if(parentResourcesLength > 0) {
+                               const parentResourceIndex = this.generalService.getRandomIntBetween(0, parentResourcesLength-1)
+                               const parentResource = parentResources[parentResourceIndex]
+                                console.log('parentResource', parentResource)
+                                resource[relation.selfJoinResourceIdField] = parentResource ? parentResource.id : null
+                            }
+
+                        }
                     }
                 }
-                resources.push(resource)
-                // console.log('resource', resource)
+                // before push avoid duplicate
+                let alreadyResource = false;
+                if(model.keys) {
+                    alreadyResource = resources.find(x => {
+                    let exists = true;
+                        console.log('model.keys', model.keys)
+                        model.keys.forEach(key => {
+                            if(x[key] != resource[key]) {
+                                exists = false
+                            }
+                        })
+                        return exists
+                    })
+                }
+                console.log('alreadyResource', alreadyResource)
+                if(!alreadyResource) {
+                    resources.push(resource)
+                }
+                console.log('resource', resource)
             }
             // console.log('resources', resources)
             if(model.handleStore) {

@@ -65,6 +65,11 @@ class GeneralService {
         // console.log('keys', keys)
         return keys
       }
+      getRandomIntBetween(min, max) {  
+        return Math.floor(
+          Math.random() * (max - min) + min
+        )
+      }
   }
   module.exports = {
     GeneralService,

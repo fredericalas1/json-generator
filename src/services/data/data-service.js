@@ -6,16 +6,18 @@ class DataService {
     getData(fileUrl) {
         let file = null;
         file = fileUrl;
+        let rawdata = null;
         try {
             rawdata = fs.readFileSync(file);
         } catch (error) {
 
         }
-        let data = {};
+        let data = [];
         try {
             data = JSON.parse(rawdata);
         } catch (error) {
-            data = {};
+            console.log('error', error)
+            data = [];
         }
         return data;
     }
@@ -25,7 +27,7 @@ class DataService {
         try {
             fs.writeFileSync(file, JSON.stringify(newData));
         } catch (error) {
-
+            console.log('error', error)
         }
     }
 
